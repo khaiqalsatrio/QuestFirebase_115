@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -119,6 +120,7 @@ fun HomeScreen(
     navigateToItemEntry: () -> Unit,
     modifier: Modifier = Modifier,
     onDetailClick: (String) -> Unit = {},
+    onDeleteClick: (Mahasiswa) -> Unit = {}, // Tambahkan parameter onDeleteClick
     viewModel: HomeViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -127,6 +129,7 @@ fun HomeScreen(
         modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            // Anda bisa menambahkan AppBar jika diperlukan
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -143,16 +146,18 @@ fun HomeScreen(
             retryAction = { viewModel.getMhs() },
             modifier = Modifier.padding(innerPadding),
             onDetailClick = onDetailClick,
+            onDeleteClick = onDeleteClick // Panggil onDeleteClick
         )
     }
 }
+
 
 @Composable
 fun HomeStatus(
     homeUiState: HomeUiState,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
-    onDeleteClick: (Mahasiswa) -> Unit = {},
+    onDeleteClick: (Mahasiswa) -> Unit = {}, // Accept onDeleteClick parameter
     onDetailClick: (String) -> Unit
 ) {
     var deleteConfirmationRequired by rememberSaveable {
@@ -167,32 +172,70 @@ fun HomeStatus(
             ListMahasiswa(
                 listMhs = homeUiState.data,
                 modifier = modifier.fillMaxWidth(),
-                onClick = { nim ->
-                    onDetailClick(nim) // Panggil onDetailClick dengan parameter nim
-                },
+                onClick = { nim -> onDetailClick(nim) },
                 onDelete = { mhs ->
-                    deleteConfirmationRequired = mhs // Set mahasiswa untuk dialog konfirmasi
+                    deleteConfirmationRequired = mhs // Set the mahasiswa to confirm delete
                 }
             )
+
+            // Show the delete confirmation dialog when required
             deleteConfirmationRequired?.let { data ->
                 DeleteConfirmationDialog(
                     onDeleteConfirm = {
-                        onDeleteClick(data) // Panggil onDeleteClick dengan data
-                        deleteConfirmationRequired = null // Reset nilai setelah konfirmasi
+                        onDeleteClick(data) // Call the delete function
+                        deleteConfirmationRequired = null // Reset after deletion
                     },
                     onDeleteCancel = {
-                        deleteConfirmationRequired = null // Reset nilai jika dibatalkan
+                        deleteConfirmationRequired = null // Reset if canceled
                     }
                 )
             }
         }
+        is HomeUiState.Error -> {
+            OnError(
+                message = homeUiState.errorMessage ?: "Terjadi kesalahan.",
+                retryAction = retryAction,
+                modifier = modifier.fillMaxSize()
+            )
+        }
 
-        is HomeUiState.Error -> TODO()
+        HomeUiState.Delete -> {
+            // Tampilkan UI sederhana atau logika pemberitahuan
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Data berhasil dihapus.", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+
+        HomeUiState.Empty -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_connection_error), // Ilustrasi kosong
+                        contentDescription = null,
+                        modifier = Modifier.size(150.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Tidak ada data tersedia.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+
     }
+
 }
-
-
-
 
 @Composable
 fun ListMahasiswa(
