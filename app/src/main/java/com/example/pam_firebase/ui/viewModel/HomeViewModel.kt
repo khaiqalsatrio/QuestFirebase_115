@@ -22,6 +22,16 @@ class HomeViewModel (
         getMhs()
     }
 
+    fun deleteMhs(mahasiswa: Mahasiswa) {
+        viewModelScope.launch {
+            try {
+                repoMhs.deleteMhs(mahasiswa)
+            } catch (e: Exception) {
+                mhsUiState = HomeUiState.Error(e)
+            }
+        }
+    }
+
     fun getMhs() {
         viewModelScope.launch {
             repoMhs.getAllMhs()
