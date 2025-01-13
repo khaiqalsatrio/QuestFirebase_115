@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
@@ -30,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,7 +58,9 @@ fun CardMhs(
     onDelete: (Mahasiswa) -> Unit = {},
     mhs: Mahasiswa,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit = { }
+    onClick: (String) -> Unit = { },
+    onDetailClick: (String) -> Unit = {},
+
 ) {
     Card(
         onClick = { onClick(mhs.nim) },  // Make sure onClick handles nim properly
@@ -71,10 +75,10 @@ fun CardMhs(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Filled.Person, contentDescription = "")
+                Icon(imageVector = Icons.Filled.AccountBox, contentDescription = "")
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    text = mhs.nama,
+                    text = mhs.judulSkripsi,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )
@@ -103,10 +107,10 @@ fun CardMhs(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Filled.Home, contentDescription = "")
+                Icon(imageVector = Icons.Filled.Person, contentDescription = "")
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    text = mhs.kelas,
+                    text = mhs.dosBim1,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -118,9 +122,8 @@ fun CardMhs(
 @Composable
 fun HomeScreen(
     navigateToItemEntry: () -> Unit,
+    navigateToDetail: (String) -> Unit, // Tambahkan fungsi navigasi ke detail
     modifier: Modifier = Modifier,
-    onDetailClick: (String) -> Unit = {},
-    onDeleteClick: (Mahasiswa) -> Unit = {}, // Tambahkan parameter onDeleteClick
     viewModel: HomeViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -129,7 +132,10 @@ fun HomeScreen(
         modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            // Anda bisa menambahkan AppBar jika diperlukan
+            TopAppBar(
+                title = { Text("Daftar Mahasiswa") },
+                scrollBehavior = scrollBehavior
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -145,8 +151,8 @@ fun HomeScreen(
             homeUiState = viewModel.mhsUiState,
             retryAction = { viewModel.getMhs() },
             modifier = Modifier.padding(innerPadding),
-            onDetailClick = onDetailClick,
-            onDeleteClick = onDeleteClick // Panggil onDeleteClick
+            onDetailClick = navigateToDetail, // Navigasikan ke detail
+            onDeleteClick = { viewModel.deleteMhs(it) }
         )
     }
 }
@@ -260,7 +266,6 @@ fun ListMahasiswa(
     }
 }
 
-
 @Composable
 private fun DeleteConfirmationDialog(
     onDeleteConfirm: () -> Unit,
@@ -270,18 +275,18 @@ private fun DeleteConfirmationDialog(
     AlertDialog(
         onDismissRequest = onDeleteCancel,
         title = { Text("Delete Data") },
-        text = { Text("Apakah Anda yakin ingin menghapus data?") },
+        text = { Text("Are you sure you want to delete this data?") },
         confirmButton = {
             TextButton(onClick = onDeleteConfirm) {
-                Text(text = "Yes")
+                Text("Yes")
             }
         },
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
-                Text(text = "Cancel")
+                Text("Cancel")
             }
         },
-        modifier = modifier
+        modifier = modifier.padding(16.dp) // Menambahkan padding agar tidak terlalu rapat
     )
 }
 

@@ -92,9 +92,9 @@ fun InsertView(
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             InsertBodyMhs(
                 uiState = uiEvent,
@@ -140,7 +140,7 @@ fun InsertBodyMhs(
                 CircularProgressIndicator(
                     color = Color.White,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(8.dp)
                         .padding(end = 8.dp)
                 )
                 Text("Loading...")
@@ -162,36 +162,24 @@ fun FormMahasiswa(
     val kelas = listOf("A", "B", "C", "D", "E")
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
+
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = mahasiswaEvent.nama,
-            onValueChange = {
-                onValueChange(mahasiswaEvent.copy(nama = it))
-            },
+            onValueChange = { onValueChange(mahasiswaEvent.copy(nama = it)) },
             label = { Text("Nama") },
-            isError = errorState.nama != null,
-            placeholder = { Text("Masukan nama") },
-        )
-        Text(
-            text = errorState.nama ?: "",
-            color = Color.Red
-        )
-
-        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = mahasiswaEvent.nim, onValueChange = {
-                onValueChange(mahasiswaEvent.copy(nim = it))
-            },
-            label = { Text("NIM") },
-            isError = errorState.nim != null,
-            placeholder = { Text("Masukan NIM") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            singleLine = true
         )
-        Text(text = errorState.nim ?: "", color = Color.Red)
+        OutlinedTextField(
+            value = mahasiswaEvent.nim,
+            onValueChange = { onValueChange(mahasiswaEvent.copy(nim = it)) },
+            label = { Text("Nim") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Gender")
         Row(
             modifier = Modifier.fillMaxWidth()
@@ -219,18 +207,13 @@ fun FormMahasiswa(
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = mahasiswaEvent.alamat,
-            onValueChange = {
-                onValueChange(mahasiswaEvent.copy(alamat = it))
-            },
+            onValueChange = { onValueChange(mahasiswaEvent.copy(alamat = it)) },
             label = { Text("Alamat") },
-            isError = errorState.alamat != null,
-            placeholder = { Text("Masukan Alamat") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
-        Text(text = errorState.alamat ?: "", color = Color.Red)
 
-        Spacer(modifier = Modifier.height(16.dp))
         Text(text = "kelas")
         Row {
             kelas.forEach { kelas ->
@@ -254,16 +237,42 @@ fun FormMahasiswa(
         )
 
         OutlinedTextField(
+            value = mahasiswaEvent.angkatan,
+            onValueChange = { onValueChange(mahasiswaEvent.copy(angkatan = it)) },
+            label = { Text("Angkatan") },
             modifier = Modifier.fillMaxWidth(),
-            value = mahasiswaEvent.alamat,
-            onValueChange = {
-                onValueChange(mahasiswaEvent.copy(alamat = it))
-            },
-            label = { Text("Agkatan") },
-            isError = errorState.angkatan != null,
-            placeholder = { Text("Masukan Angkatan") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            singleLine = true
         )
         Text(text = errorState.angkatan ?: "", color = Color.Red)
+
+        OutlinedTextField(
+            value = mahasiswaEvent.judulSkripsi,
+            onValueChange = { onValueChange(mahasiswaEvent.copy(judulSkripsi = it)) },
+            label = { Text("Judul Skripsi") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        Text(text = errorState.judulSkripsi ?: "", color = Color.Red)
+
+        OutlinedTextField(
+            value = mahasiswaEvent.dosBim1,
+            onValueChange = { onValueChange(mahasiswaEvent.copy(dosBim1 = it)) },
+            label = { Text("Dosen Pembimbing 1") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        Text(text = errorState.dosBim1 ?: "", color = Color.Red)
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = mahasiswaEvent.dosBim2,
+            onValueChange = {
+                onValueChange(mahasiswaEvent.copy(dosBim2 = it))
+            },
+            label = { Text("Dosen Pembimbing 2") },
+            isError = errorState.dosBim2 != null,
+            placeholder = { Text("Masukan Dosen Pembimbing 2") },
+        )
+        Text(text = errorState.dosBim2 ?: "", color = Color.Red)
     }
 }

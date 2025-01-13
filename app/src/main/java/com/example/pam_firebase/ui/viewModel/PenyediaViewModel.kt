@@ -18,6 +18,11 @@ object PenyediaViewModel {
                 MahasiswaApp().containerApp.MhsRepository
             )
         }
+        initializer {
+            DetailViewModel (
+                MahasiswaApp().containerApp.MhsRepository
+            )
+        }
     }
 }
 
